@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo 'Cloning repository...'
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh '''
+                docker build -t devops-assignment-app ./app
+                '''
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                echo 'Running Docker container...'
+                sh '''
+                docker run -d -p 5000:5000 devops-assignment-app || true
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
